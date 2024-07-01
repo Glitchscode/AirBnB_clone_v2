@@ -120,7 +120,7 @@ class HBNBCommand(cmd.Cmd):
             return
         try:
             new_instance = HBNBCommand.classes[args.split()[0]](**params)
-            # [setattr(new_instance, k, v) for k, v in params.items()]
+            [setattr(new_instance, k, v) for k, v in params.items()]
             new_instance.save()
             print(new_instance.id)
         except Exception:
@@ -224,21 +224,14 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
-        print_list = []
-
+        cls = None
         if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
-                print("** class doesn't exist **")
-                return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
-        else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
-
-        print(print_list)
+            cls = args.split(' ')[0]  # remove possible trailing args
+            if cls not in HBNBCommand.classes:
+                return print("** class doesn't exist **")
+        from models import storage
+        objs = storage.all(cls)
+        print([str(v) for v in objs.values()])
 
     def help_all(self):
         """ Help information for the all command """
